@@ -32,7 +32,7 @@ def main():
 #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>< Upload
 
         uploaded_file = st.file_uploader(
-            "Importer un relevé bancaire",
+            "Importer un relevé bancaire BPO",
             type=["csv"],
         )
 
@@ -68,11 +68,11 @@ def main():
             f"{resultat['solde_debut']:.2f} EUR",
         )
         col2.metric(
-            "Recettes",
+            "Recettes sur la période",
             f"{resultat['total_recette']:.2f} EUR",
         )
         col3.metric(
-            "Dépenses",
+            "Dépenses sur la période",
             f"{abs(resultat['total_depense']):.2f} EUR",
         )
         col4.metric(
