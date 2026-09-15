@@ -9,7 +9,7 @@ from utils import traiter_csv
 
 def main():
 
-#>>>>>>>>>>>>>>>>>>>>> Streamlit page
+#>>>>>>>>>>>>>>>>>>>>> Config page
     st.set_page_config(
         page_title="LVR compta",
         page_icon="🧾",
@@ -17,22 +17,30 @@ def main():
         initial_sidebar_state="expanded",
     )
 
-    st.title('La Vilaine Compta ')
+#>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> En tête
 
-    st.header("Outil de Data Viz pour les comptes de l'association")
+    col1, col2, col3 = st.columns([1,3,1])
+
+    with col1:
+        st.image("images/Logo_LVR_blanc_fond_transparent.png", width=300)
+
+    with col2:
+        st.title('La Vilaine Compta ')
+
+        st.header("Outil de Data Viz pour les comptes de l'association")
 
 #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>< Upload
 
-    uploaded_file = st.file_uploader(
-        "Importer un relevé bancaire",
-        type=["csv"],
-    )
+        uploaded_file = st.file_uploader(
+            "Importer un relevé bancaire",
+            type=["csv"],
+        )
 
-    if uploaded_file is None:
-        return
+        if uploaded_file is None:
+            return
 
-    resultat = traiter_csv(uploaded_file)
-    df = resultat["df"].iloc[:-1].copy()
+        resultat = traiter_csv(uploaded_file)
+        df = resultat["df"].iloc[:-1].copy()
 
 #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Blocs
 
