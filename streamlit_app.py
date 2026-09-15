@@ -1,4 +1,9 @@
 import streamlit as st
+import altair as alt
+import pandas as pd
+from utils import traiter_csv
+
+
 # streamlit run streamlit_app.py
 
 
@@ -16,9 +21,74 @@ def main():
 
     st.header("Outil de Data Viz pour les comptes de l'association")
 
-    st.markdown("""
-    blablabla          
-    """)
+#>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>< Upload
+
+    uploaded_file = st.file_uploader(
+        "Importer un relevé bancaire",
+        type=["csv"],
+    )
+
+    if uploaded_file is None:
+        return
+
+    resultat = traiter_csv(uploaded_file)
+    df = resultat["df"].iloc[:-1].copy()
+
+#>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Blocs
+
+    col1, col2, col3 = st.columns(3)
+
+    col1.metric(
+        "Recettes",
+        f"{resultat['total_recette']:.2f} EUR",
+    )
+    col2.metric(
+        "Dépenses",
+        f"{abs(resultat['total_depense']):.2f} EUR",
+    )
+
+    if resultat["solde_fin"] is not None:
+        col3.metric(
+            "Solde bancaire à la date de fin du document",
+            f"{resultat['solde_fin']:.2f} EUR",
+        )
+
+#>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Line chart
+
+    st.subheader("Recettes et dépenses sur la période")
+
+    df["Date_Compta"] = pd.to_datetime(df["Date_Compta"])
+
+    evolution = (
+        df.groupby("Date_Compta")[["recette", "dépense"]]
+        .sum()
+        .sort_index()
+    )
+
+    st.line_chart(evolution,
+                  color=["#0db500", "#FF0000"])
+
+#>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Bar chart
+
+    df["Mois"] = df["Date_Compta"].dt.to_period("M").astype(str)
+
+    repartition_mensuelle = (
+        df.assign(dépense=df["dépense"].abs())
+        .groupby("Mois")[["recette", "dépense"]]
+        .sum()
+        .sort_index()
+    )
+
+    st.subheader("Recettes et dépenses par mois")
+    st.bar_chart(
+        repartition_mensuelle,
+        color=["#0db500", "#FF0000"],
+    )
+
+#>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Mouvements
+
+    st.subheader("Mouvements")
+    st.dataframe(df, use_container_width=True)
 
 
 if __name__ == "__main__":

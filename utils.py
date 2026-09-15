@@ -1,12 +1,19 @@
+from io import BytesIO
 from pathlib import Path
 
 import pandas as pd
 
 
 def traiter_csv(file_path):
-    file_path = Path(file_path)
+    if isinstance(file_path, (str, Path)):
+        chemin = Path(file_path)
+        contenu = chemin.read_bytes()
+        source_pandas = chemin
+    else:
+        contenu = file_path.getvalue()
+        source_pandas = BytesIO(contenu)
 
-    lignes = file_path.read_text(encoding="ISO-8859-1").splitlines()
+    lignes = contenu.decode("ISO-8859-1").splitlines()
 
     nouveau_format = any(
         ligne.startswith("Date comptable;") for ligne in lignes
@@ -34,7 +41,7 @@ def traiter_csv(file_path):
         )
 
         df = pd.read_csv(
-            file_path,
+            source_pandas,
             encoding="ISO-8859-1",
             sep=";",
             decimal=",",
@@ -70,7 +77,7 @@ def traiter_csv(file_path):
         solde_fin_banque = None
 
         df = pd.read_csv(
-            file_path,
+            source_pandas,
             encoding="ISO-8859-1",
             sep=";",
             decimal=",",
@@ -144,7 +151,7 @@ def traiter_csv(file_path):
     date_min = resultat["Date_Compta"].iloc[:-1].min()
     date_max = resultat["Date_Compta"].iloc[:-1].max()
 
-    dossier_sortie = Path("fichiers clean")
+    dossier_sortie = Path("fichiers_clean")
     dossier_sortie.mkdir(exist_ok=True)
 
     output_path = dossier_sortie / f"Mouvements_{date_min}_{date_max}.csv"
