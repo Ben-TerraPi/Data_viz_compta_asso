@@ -1,8 +1,8 @@
+import re
 from io import BytesIO
 from pathlib import Path
 
 import pandas as pd
-import re
 
 
 def traiter_csv(file_path):
@@ -21,17 +21,25 @@ def traiter_csv(file_path):
     )
 
     if nouveau_format:
-        dates_document = re.findall(r"\d{2}/\d{2}/\d{4}", lignes[0])
+        dates_document = next(
+            (
+                re.findall(r"\d{2}/\d{2}/\d{4}", ligne)
+                for ligne in lignes
+                if len(re.findall(r"\d{2}/\d{2}/\d{4}", ligne)) >= 2
+            ),
+            [],
+        )
 
-        date_debut_document = pd.to_datetime(
-            dates_document[0],
-            format="%d/%m/%Y",
-        ).date()
-
-        date_fin_document = pd.to_datetime(
-            dates_document[1],
-            format="%d/%m/%Y",
-        ).date()
+        date_debut_document = (
+            pd.to_datetime(dates_document[0], format="%d/%m/%Y").date()
+            if dates_document
+            else None
+        )
+        date_fin_document = (
+            pd.to_datetime(dates_document[1], format="%d/%m/%Y").date()
+            if len(dates_document) >= 2
+            else None
+        )
 
         ligne_fin = next(
             ligne for ligne in lignes if ligne.startswith("Solde en fin")
