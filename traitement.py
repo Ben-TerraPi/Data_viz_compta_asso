@@ -1,7 +1,7 @@
 from utils import traiter_csv
 
 
-file_path = "fichiers brut/operations_01092025_31082026.csv"
+file_path = "fichiers_brut/operations_01092025_31082026.csv"
 
 resultat = traiter_csv(file_path)
 

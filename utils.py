@@ -2,6 +2,7 @@ from io import BytesIO
 from pathlib import Path
 
 import pandas as pd
+import re
 
 
 def traiter_csv(file_path):
@@ -20,6 +21,18 @@ def traiter_csv(file_path):
     )
 
     if nouveau_format:
+        dates_document = re.findall(r"\d{2}/\d{2}/\d{4}", lignes[0])
+
+        date_debut_document = pd.to_datetime(
+            dates_document[0],
+            format="%d/%m/%Y",
+        ).date()
+
+        date_fin_document = pd.to_datetime(
+            dates_document[1],
+            format="%d/%m/%Y",
+        ).date()
+
         ligne_fin = next(
             ligne for ligne in lignes if ligne.startswith("Solde en fin")
         )
@@ -75,6 +88,8 @@ def traiter_csv(file_path):
     else:
         solde_debut_banque = None
         solde_fin_banque = None
+        date_debut_document = None
+        date_fin_document = None
 
         df = pd.read_csv(
             source_pandas,
@@ -164,5 +179,7 @@ def traiter_csv(file_path):
         "solde_calcule": solde_calcule,
         "total_recette": total_recette,
         "total_depense": total_depense,
+        "date_debut_document": date_debut_document,
+        "date_fin_document": date_fin_document,
         "output_path": output_path,
     }

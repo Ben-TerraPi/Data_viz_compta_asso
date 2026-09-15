@@ -42,24 +42,56 @@ def main():
         resultat = traiter_csv(uploaded_file)
         df = resultat["df"].iloc[:-1].copy()
 
-#>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Blocs
+#>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Gestion des dates début et fin
 
-    col1, col2, col3 = st.columns(3)
+        date_debut = resultat.get("date_debut_document")
+        date_fin = resultat.get("date_fin_document")
 
-    col1.metric(
-        "Recettes",
-        f"{resultat['total_recette']:.2f} EUR",
-    )
-    col2.metric(
-        "Dépenses",
-        f"{abs(resultat['total_depense']):.2f} EUR",
-    )
+        label_solde_debut = (
+            f"Solde bancaire au {date_debut.strftime('%d/%m/%Y')}"
+            if date_debut is not None
+            else "Solde bancaire à la date de début du document"
+        )
+        label_solde_fin = (
+            f"Solde bancaire au {date_fin.strftime('%d/%m/%Y')}"
+            if date_fin is not None
+            else "Solde bancaire à la date de fin du document"
+        )
 
-    if resultat["solde_fin"] is not None:
+#>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Blocs calcul
+
+    if resultat["solde_debut"] is not None:
+        col1, col2, col3, col4 = st.columns(4)
+
+        col1.metric(
+            label_solde_debut,
+            f"{resultat['solde_debut']:.2f} EUR",
+        )
+        col2.metric(
+            "Recettes",
+            f"{resultat['total_recette']:.2f} EUR",
+        )
         col3.metric(
-            "Solde bancaire à la date de fin du document",
+            "Dépenses",
+            f"{abs(resultat['total_depense']):.2f} EUR",
+        )
+        col4.metric(
+            label_solde_fin,
             f"{resultat['solde_fin']:.2f} EUR",
         )
+    else:
+        st.info("Les soldes bancaires ne sont pas disponibles pour cet ancien format.")
+
+#>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>< Téléchargement du fichier traité
+
+    output_path = resultat["output_path"]
+
+    st.download_button(
+        label="Télécharger le fichier traité",
+        data=output_path.read_bytes(),
+        file_name=output_path.name,
+        mime="text/csv",
+    )
 
 #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Line chart
 
