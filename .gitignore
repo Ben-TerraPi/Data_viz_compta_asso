@@ -1,6 +1,7 @@
 fichiers_brut/*
 fichiers_clean/*
 .vscode
+traitement.py
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[codz]
