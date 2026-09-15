@@ -6,3 +6,5 @@ https://lvrcompta.streamlit.app/
 
 ![Après upload](images/172623.png)
 
+## Après upload d'un relevé .csv classique, un nouveau fichier est téléchargeable avec en supplément les totaux des recettes et dépenses et le bénéfice sur la période.
+
